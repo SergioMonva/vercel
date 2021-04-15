@@ -1,56 +1,95 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import {
+  Carousel,
+  CarouselItem,
+  CarouselControl,
+  CarouselIndicators,
+  CarouselCaption
+} from 'reactstrap';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import foto1 from './img/desktopBrochureResolucionMedia01.jpg'
+import foto2 from './img/desktopUnitopia.jpg'
+import foto3 from './img/desktopPantalla03.jpg'
+import foto4 from './img/mobileBrochureResolucionMedia01.jpg'
+import foto5 from './img/mobileUnitopia.jpg'
+import foto6 from './img/mobilePantalla03.jpg'
 
-function App() {
-  const [date, setDate] = useState(null);
-  useEffect(() => {
-    async function getDate() {
-      const res = await fetch('/api/date');
-      const newDate = await res.text();
-      setDate(newDate);
-    }
-    getDate();
-  }, []);
+const items = [
+  {
+    src: detectDevice(foto1, foto4),
+    altText: 'Slide 1',
+    caption: 'Slide 1',
+    href: 'http://sergiomonva.com'
+  },
+  {
+    src: detectDevice(foto2, foto5),
+    altText: 'Slide 2',
+    caption: 'Slide 2',
+    href: 'http://facebook.com'
+  },
+  {
+    src: detectDevice(foto3, foto6),
+    altText: 'Slide 3',
+    caption: 'Slide 3',
+    href: 'http://youtube.com'
+  }
+];
+
+function detectDevice(fotoA, fotoB) {
+  if(window.screen.width<window.screen.height) {
+    return fotoB;
+  } else {
+    return fotoA;
+  }
+}
+
+const App = (props) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [animating, setAnimating] = useState(false);
+
+  const next = () => {
+    if (animating) return;
+    const nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1;
+    setActiveIndex(nextIndex);
+  }
+
+  const previous = () => {
+    if (animating) return;
+    const nextIndex = activeIndex === 0 ? items.length - 1 : activeIndex - 1;
+    setActiveIndex(nextIndex);
+  }
+
+  const goToIndex = (newIndex) => {
+    if (animating) return;
+    setActiveIndex(newIndex);
+  }
+
+  const slides = items.map((item) => {
+    return (
+      <CarouselItem
+        onExiting={() => setAnimating(true)}
+        onExited={() => setAnimating(false)}
+        key={item.src}
+      >
+        <img className="mainImage" src={item.src} alt={item.altText} />
+        <a href={item.href} _target="_blank">{item.href}</a>
+        <CarouselCaption captionText={item.caption} captionHeader={item.caption} />
+      </CarouselItem>
+    );
+  });
+
   return (
-    <main>
-      <h1>Create React App + Go API</h1>
-      <h2>
-        Deployed with{' '}
-        <a
-          href="https://vercel.com/docs"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Vercel
-        </a>
-        !
-      </h2>
-      <p>
-        <a
-          href="https://github.com/vercel/vercel/tree/master/examples/create-react-app"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          This project
-        </a>{' '}
-        was bootstrapped with{' '}
-        <a href="https://facebook.github.io/create-react-app/">
-          Create React App
-        </a>{' '}
-        and contains three directories, <code>/public</code> for static assets,{' '}
-        <code>/src</code> for components and content, and <code>/api</code>{' '}
-        which contains a serverless <a href="https://golang.org/">Go</a>{' '}
-        function. See{' '}
-        <a href="/api/date">
-          <code>api/date</code> for the Date API with Go
-        </a>
-        .
-      </p>
-      <br />
-      <h2>The date according to Go is:</h2>
-      <p>{date ? date : 'Loading date...'}</p>
-    </main>
+    <Carousel
+      activeIndex={activeIndex}
+      next={next}
+      previous={previous}
+    >
+      <CarouselIndicators items={items} activeIndex={activeIndex} onClickHandler={goToIndex} />
+      {slides}
+      <CarouselControl direction="prev" directionText="Previous" onClickHandler={previous} />
+      <CarouselControl direction="next" directionText="Next" onClickHandler={next} />
+    </Carousel>
   );
 }
 
