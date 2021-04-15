@@ -72,7 +72,7 @@ const App = (props) => {
         onExited={() => setAnimating(false)}
         key={item.src}
       >
-        <img className="mainImage" src={item.src} alt={item.altText} />
+        <img className="mainImage" src={item.src} alt={item.altText} width="100%"/>
         <a href={item.href} _target="_blank">{item.href}</a>
         <CarouselCaption captionText={item.caption} captionHeader={item.caption} />
       </CarouselItem>
